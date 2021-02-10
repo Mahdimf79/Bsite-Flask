@@ -1,0 +1,89 @@
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}">
+    </head>
+    <body>
+      <div>
+        <p id="error"></p>
+      </div>
+
+      <form method="post" id="form">
+      <div class="login-box">
+      <div class="text">
+          <p class="title">Here you can login</p>
+          <small>Let's join us :)</small>
+      </div>
+
+
+      <div class="inputs">
+        <label>Email</label>
+        <input type="text" placeholder="Username" name="username" id="user" class="in2"/>
+
+        <label>Password</label>
+        <input type="text" placeholder="Password" name="password" id="pass"/>
+
+        <button class="btn-login" id="sub">LOGIN</button>
+
+        <a href="#" class="forget">Forgot your password?</a>
+      </div>
+      </div>
+      </form>
+
+      <div class="pointer">
+      <a href="#">Signup</a>
+      <img src="img/icons-8-left.svg" alt="pointer" class="cursor">
+      </div>
+
+
+
+    {% block javascript %}
+    <script>
+
+    const form = document.getElementById('form');
+
+    form.addEventListener('submit', handleSubmit);
+
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('user').value;
+
+      const password = document.getElementById('pass').value;
+
+      const error = document.getElementById('error');
+
+      if(username.length >= 5 && username.length <= 30){
+        if(password.length >= 8 && password.length <= 64){
+          fetch('http://127.0.0.1:5000/login/set',{
+             method: 'POST',
+             headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+               "X-CSRFToken": '{{csrf_token}}',
+             },
+             body: `username=${username}&password=${password}`
+          })
+          .then(response => response.json())
+          .then(data => {
+            if(data.ok){
+              window.location.href = "http://127.0.0.1:5000/";
+
+            }else{
+              error.innerHTML = data.status;
+            }
+          });
+        }else{
+          error.innerHTML = "The number of characters in the password is not allowed";
+        }
+      }else{
+        error.innerHTML = "The number of characters in the username is not allowed";
+      }
+
+    }
+
+    </script>
+{% endblock javascript %}
+
+</body>
+</html>

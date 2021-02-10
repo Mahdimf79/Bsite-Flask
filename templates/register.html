@@ -1,0 +1,108 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}">
+    </head>
+    <body>
+      <div>
+        <p id="error"></p>
+      </div>
+
+      <form method="post" id="form">
+      <div class="login-box">
+      <div class="text">
+          <p class="title">Here you can login</p>
+          <small>Let's join us :)</small>
+      </div>
+
+      <div class="inputs">
+        <label>Username</label>
+        <input type="text" placeholder="Username" name="username" id="username" class="in2"/>
+
+        <label>Email</label>
+        <input type="text" name="email" id="email" placeholder="Email" class="in2"/>
+
+        <label>Password</label>
+        <input type="text" name="password" id="password" placeholder="Password" class="in2"/>
+
+        <label>RePassword</label>
+        <input type="text" name="repassword" id="repassword" placeholder="RePassword" class="in2"/>
+
+        <button class="btn-login" id="sub">REGISTER</button>
+
+        <a href="#" class="forget">Forgot your password?</a>
+      </div>
+      </div>
+      </form>
+
+      <div class="pointer">
+      <a href="#">Signup</a>
+      <img src="img/icons-8-left.svg" alt="pointer" class="cursor">
+      </div>
+
+{% block javascript %}
+<script>
+
+    const form = document.getElementById('form');
+
+    form.addEventListener('submit', handleSubmit);
+
+    function handleSubmit(e) {
+      e.preventDefault();
+
+
+      function validateEmail(emailget) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(emailget).toLowerCase());
+      }
+
+
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const repassword = document.getElementById('repassword').value;
+
+      const error = document.getElementById('error');
+
+
+
+      if(username.length >= 5 && username.length <= 30){
+        if(password.length >= 8 && password.length <= 64){
+          if(repassword == password){
+            if(validateEmail(email)){
+              fetch('http://127.0.0.1:5000/register/set',{
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+                   "X-CSRFToken": '{{csrf_token}}',
+                 },
+                 body: `username=${username}&password=${password}&repassword=${repassword}&email=${email}`
+              })
+              .then(response => response.json())
+              .then(data => {
+                if(data.ok){
+                  window.location.href = "http://127.0.0.1:5000/";
+                }else{
+                  error.innerHTML = data.status;
+                }
+              });
+            }else{
+              error.innerHTML = "Invalid Email";
+            }
+          }else{
+            error.innerHTML = "A password is not the same as repeating a password";
+          }
+        }else{
+          error.innerHTML = "The number of characters in the password is not allowed";
+        }
+      }else{
+        error.innerHTML = "The number of characters in the username is not allowed";
+      }
+
+    }
+
+</script>
+{% endblock javascript %}
+
+</body>
+</html>

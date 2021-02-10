@@ -1,0 +1,6 @@
+{% if user != None %}
+  <h1>Hello, {{ user }}</h1>
+  <a href="http://127.0.0.1:5000/logout">Logout</a>
+{% else %}
+  <h1>Hello, World</h1>
+{% endif %}
