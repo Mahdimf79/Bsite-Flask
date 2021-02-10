@@ -17,6 +17,8 @@ def index():
 
 @app.route('/register')
 def register():
+    if session.get('username') != None:
+        return index()
     return render_template('register.html')
 
 @app.route('/register/set' , methods=['GET', 'POST'])
