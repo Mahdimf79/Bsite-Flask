@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session,redirect
 from flask_pymongo import PyMongo
 from utils.registeralogin import util
 
@@ -18,7 +18,7 @@ def index():
 @app.route('/register')
 def register():
     if session.get('username') != None:
-        return index()
+        return redirect('/')
     return render_template('register.html')
 
 @app.route('/register/set' , methods=['GET', 'POST'])
@@ -57,16 +57,24 @@ def register_set():
             }
             return jsonify(obj)
 
-        obj_user = {
-            'username' : username,
-            'password' : password,
-            'email' : email
-        }
-        users.insert_one(obj_user)
-        obj = {
-            'ok': True,
-            'status' : 'sucssecful'
-        }
+        user_check = users.find_one({'username' : username})
+        email_check = users.find_one({'email' : email})
+        if user_check == None and email_check == None:
+            obj_user = {
+                'username' : username,
+                'password' : password,
+                'email' : email
+            }
+            users.insert_one(obj_user)
+            obj = {
+                'ok': True,
+                'status' : 'sucssecful'
+            }
+        else:
+            obj = {
+                'ok': False,
+                'status' : 'Exists username or email'
+            }
         return jsonify(obj)
     else:
         return render_template('register.html')
@@ -75,7 +83,7 @@ def register_set():
 @app.route('/login')
 def login():
     if session.get('username') != None:
-        return index()
+        return redirect('/')
     return render_template('login.html')
 
 @app.route('/login/set' , methods=['GET', 'POST'])
@@ -123,8 +131,7 @@ def login_set():
 def logout():
     if session.get('username') != None:
         session['username'] = None
-
-    return index()
+    return redirect('/')
 
 
 if __name__ == '__main__':

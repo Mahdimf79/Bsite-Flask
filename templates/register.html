@@ -81,7 +81,7 @@
               .then(response => response.json())
               .then(data => {
                 if(data.ok){
-                  window.location.href = "http://127.0.0.1:5000/";
+                  window.location.href = "http://127.0.0.1:5000/login";
                 }else{
                   error.innerHTML = data.status;
                 }
