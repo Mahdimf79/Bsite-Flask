@@ -9,7 +9,8 @@ body {
 
 .wave {
     width: 100%;
-    position: fixed;
+    z-index: -1;
+    position: absolute;
     bottom: 0;
     left: 0;
 }
@@ -61,6 +62,7 @@ label {
     display:flex;
     flex-direction: column;
     margin-top: 3%;
+    padding-bottom: 100px;
 }
 .inputs input {
     margin-top: 3%;
@@ -81,6 +83,7 @@ label {
     cursor: pointer;
     transition:0.5s;
     padding: 10px;
+    z-index: 1;
 }
 
 .btn-login:hover {

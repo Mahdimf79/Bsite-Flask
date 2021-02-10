@@ -12,7 +12,7 @@
       <form method="post" id="form">
       <div class="login-box">
       <div class="text">
-          <p class="title">Here you can login</p>
+          <p class="title">Here you can register</p>
           <small>Let's join us :)</small>
       </div>
 
@@ -31,14 +31,15 @@
 
         <button class="btn-login" id="sub">REGISTER</button>
 
-        <a href="#" class="forget">Forgot your password?</a>
       </div>
       </div>
       </form>
-
+      <img src="{{ url_for('static',filename='img/wave.svg') }}" alt="wave" class="wave">
       <div class="pointer">
-      <a href="#">Signup</a>
-      <img src="img/icons-8-left.svg" alt="pointer" class="cursor">
+        <a href="http://127.0.0.1:5000/login">
+          Signin
+          <img src="{{ url_for('static',filename='img/icons-8-left.svg') }}" alt="pointer" class="cursor">
+        </a>
       </div>
 
 {% block javascript %}

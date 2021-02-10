@@ -11,30 +11,33 @@
       </div>
 
       <form method="post" id="form">
-      <div class="login-box">
-      <div class="text">
-          <p class="title">Here you can login</p>
-          <small>Let's join us :)</small>
-      </div>
+          <div class="login-box">
+          <div class="text">
+              <p class="title">Here you can login</p>
+              <small>Let's join us :)</small>
+          </div>
 
 
-      <div class="inputs">
-        <label>Email</label>
-        <input type="text" placeholder="Username" name="username" id="user" class="in2"/>
+          <div class="inputs">
+              <label>Email</label>
+              <input type="text" placeholder="Username" name="username" id="user" class="in2"/>
 
-        <label>Password</label>
-        <input type="text" placeholder="Password" name="password" id="pass"/>
+              <label>Password</label>
+              <input type="text" placeholder="Password" name="password" id="pass"/>
 
-        <button class="btn-login" id="sub">LOGIN</button>
+              <button class="btn-login" id="sub">LOGIN</button>
 
-        <a href="#" class="forget">Forgot your password?</a>
-      </div>
-      </div>
+              <a href="#" class="forget">Forgot your password?</a>
+          </div>
+          </div>
       </form>
-
+      <img src="{{ url_for('static',filename='img/wave.svg') }}" alt="wave" class="wave">
       <div class="pointer">
-      <a href="#">Signup</a>
-      <img src="img/icons-8-left.svg" alt="pointer" class="cursor">
+      <a href="http://127.0.0.1:5000/register">
+        Signup
+        <img src="{{ url_for('static',filename='img/icons-8-left.svg') }}" alt="pointer" class="cursor">
+      </a>
+
       </div>
 
 
