@@ -4,6 +4,12 @@
         <meta charset="UTF-8">
         <title>Login</title>
         <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}">
+        <style>
+          .login-box {
+            margin-top: 70px;
+             padding-bottom: 0 !important;
+          }
+        </style>
     </head>
     <body>
       <div>
@@ -33,11 +39,10 @@
       </form>
       <img src="{{ url_for('static',filename='img/wave.svg') }}" alt="wave" class="wave">
       <div class="pointer">
-      <a href="http://127.0.0.1:5000/register">
-        Signup
-        <img src="{{ url_for('static',filename='img/icons-8-left.svg') }}" alt="pointer" class="cursor">
-      </a>
-
+        <a href="http://127.0.0.1:5000/register">
+          Signup
+          <img src="{{ url_for('static',filename='img/icons-8-left.svg') }}" alt="pointer" class="cursor">
+        </a>
       </div>
 
 

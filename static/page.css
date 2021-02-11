@@ -1,18 +1,24 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.3s;
+}
+
 body {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
     background-color: #0a194a;
     font-family: 'Open Sans', sans-serif;
     position: relative;
+    overflow: hidden;
 }
 
 .wave {
     width: 100%;
-    z-index: -1;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
+    z-index: -1;
 }
 
 .login-box {
@@ -21,6 +27,7 @@ body {
     width: 100%;
     align-items: center;
     justify-content: center;
+    padding-bottom: 80px;
 }
 
 .title {
@@ -31,14 +38,13 @@ body {
 
 .text {
     width: 323px;
-    margin-top: 6%;
+    margin-top: 2%;
     display: flex;
     flex-direction: column;
 }
 
 .text small {
     color: #87aad8;
-    margin-top: -20px;
 }
 
 label {
@@ -55,20 +61,23 @@ label {
     height: 32px;
     transition:0.3s;
     color : #f2f2f2;
-    padding: 5px;
+    padding: 10px 10px;
+}
+
+.login-box input:focus {
+  border-color: #ccc;
 }
 
 .inputs {
     display:flex;
     flex-direction: column;
     margin-top: 3%;
-    padding-bottom: 100px;
 }
 .inputs input {
     margin-top: 3%;
 }
 
-.in2{
+.in2 {
     margin-bottom: 20px;
 }
 
@@ -83,7 +92,6 @@ label {
     cursor: pointer;
     transition:0.5s;
     padding: 10px;
-    z-index: 1;
 }
 
 .btn-login:hover {
@@ -99,21 +107,64 @@ label {
 }
 
 .pointer {
-    position: absolute;
+    position: fixed;
     top: 7%;
     right: 5%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .pointer a {
     margin-right: 10px;
     text-decoration: none;
     color: #87aad8;
+    display: flex;
+}
+ .pointer img:hover {
+  transform: rotate(360deg);
+}
+
+.pointer a:hover {
+  color: #ccc;
+}
+
+.pointer img {
+  margin-left: 10px;
 }
 
 .cursor {
     width: 22px;
     vertical-align: center;
+}
+
+
+.erroralert {
+  width: 350px;
+  height:80px;
+  background: #f45;
+  border-radius: 20px;
+  padding: 20px;
+  color: #fff;
+  margin: auto auto;
+}
+
+@media (min-width: 120px) and (max-width: 580px) {
+
+  body {
+    height: 40vh !important;
+  }
+
+  .login-box {
+    padding-bottom: 0;
+  }
+  .login-box input {
+    width: 250px;
+  }
+
+  .text {
+    padding: 20px 30px;
+    margin-top: 50px;
+  }
+
+  .text p {
+    font-size: 18px;
+  }
 }
