@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}">
     </head>
     <body>
-      <div class="erroralert">
+      <div id="erroralert">
         <p id="error"></p>
       </div>
 
@@ -58,6 +58,18 @@
         return re.test(String(emailget).toLowerCase());
       }
 
+      function show_alert(){
+        const alerts = document.getElementById('erroralert');
+        alerts.classList.add("erroralert");
+        return
+      }
+
+      function hide_alert(){
+        const alerts = document.getElementById('erroralert');
+        alerts.classList.remove("erroralert");
+        error.innerHTML = "";
+        return
+      }
 
       const username = document.getElementById('username').value;
       const email = document.getElementById('email').value;
@@ -84,20 +96,30 @@
                 if(data.ok){
                   window.location.href = "http://127.0.0.1:5000/login";
                 }else{
+                  show_alert()
                   error.innerHTML = data.status;
+                  window.setTimeout(hide_alert, 3000);
                 }
               });
             }else{
+              show_alert()
               error.innerHTML = "Invalid Email";
+              window.setTimeout(hide_alert, 3000);
             }
           }else{
+            show_alert()
             error.innerHTML = "A password is not the same as repeating a password";
+            window.setTimeout(hide_alert, 3000);
           }
         }else{
+          show_alert()
           error.innerHTML = "The number of characters in the password is not allowed";
+          window.setTimeout(hide_alert, 3000);
         }
       }else{
+        show_alert()
         error.innerHTML = "The number of characters in the username is not allowed";
+        window.setTimeout(hide_alert, 3000);
       }
 
     }

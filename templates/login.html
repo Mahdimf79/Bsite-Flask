@@ -12,7 +12,7 @@
         </style>
     </head>
     <body>
-      <div>
+      <div id="erroralert">
         <p id="error"></p>
       </div>
 
@@ -63,6 +63,20 @@
 
       const error = document.getElementById('error');
 
+
+      function show_alert(){
+        const alerts = document.getElementById('erroralert');
+        alerts.classList.add("erroralert");
+        return
+      }
+
+      function hide_alert(){
+        const alerts = document.getElementById('erroralert');
+        alerts.classList.remove("erroralert");
+        error.innerHTML = "";
+        return
+      }
+
       if(username.length >= 5 && username.length <= 30){
         if(password.length >= 8 && password.length <= 64){
           fetch('http://127.0.0.1:5000/login/set',{
@@ -78,14 +92,20 @@
               window.location.href = "http://127.0.0.1:5000/";
 
             }else{
+              show_alert()
               error.innerHTML = data.status;
+              window.setTimeout(hide_alert, 3000);
             }
           });
         }else{
+          show_alert()
           error.innerHTML = "The number of characters in the password is not allowed";
+          window.setTimeout(hide_alert, 3000);
         }
       }else{
+        show_alert()
         error.innerHTML = "The number of characters in the username is not allowed";
+        window.setTimeout(hide_alert, 3000);
       }
 
     }
