@@ -1,0 +1,7 @@
+{% if user != None %}
+  <p> Activate account </p>
+  <a href="http://127.0.0.1:5000/login"> Login </a>
+{% else %}
+  <p> Wrong username or activation code </p>
+  <a href="http://127.0.0.1:5000/"> Home </a>
+{% endif %}

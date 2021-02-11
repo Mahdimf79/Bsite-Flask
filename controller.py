@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify, session,redirect
 from flask_pymongo import PyMongo
 from utils.registeralogin import util
+from sendemail import send_message
+import random
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/betsite_db"
@@ -60,11 +62,25 @@ def register_set():
         user_check = users.find_one({'username' : username})
         email_check = users.find_one({'email' : email})
         if user_check == None and email_check == None:
+            ran = random.randint(100000,999999)
             obj_user = {
                 'username' : username,
                 'password' : password,
-                'email' : email
+                'email' : email,
+                'score' : 0,
+                'money' : 0,
+                'activate' : False,
+                'code' : ran
             }
+            try:
+                send_message(email,ran,username)
+            except:
+                obj = {
+                    'ok': False,
+                    'status' : 'There was a problem verifying the email'
+                }
+                return jsonify(obj)
+
             users.insert_one(obj_user)
             obj = {
                 'ok': True,
@@ -92,8 +108,6 @@ def login_set():
         username = request.form['username']
         password = request.form['password']
 
-        user = users.find_one({'username' : username , 'password' : password})
-
         if not util.checklength(username,5,30):
             obj = {
                 'ok': False,
@@ -108,18 +122,26 @@ def login_set():
             }
             return jsonify(obj)
 
+        user = users.find_one({'username' : username , 'password' : password})
+
         if user != None:
-            obj= {
-                'ok': True,
-                'values': {
-                    'username' : username
+            if user['activate'] == True:
+                obj= {
+                    'ok': True,
+                    'values': {
+                        'username' : user['username']
+                    }
                 }
-            }
-            session['username'] = username
+                session['username'] = user['username']
+            else:
+                obj= {
+                    'ok': False,
+                    'status' : 'Your account is not activated. See your email'
+                }
         else:
             obj= {
                 'ok': False,
-                'status' : 'Faild join'
+                'status' : 'Username or password is incorrect'
             }
     else:
         return render_template('index.html')
@@ -132,6 +154,17 @@ def logout():
     if session.get('username') != None:
         session['username'] = None
     return redirect('/')
+
+
+@app.route('/<username>/<int:code>')
+def activate_user(username,code):
+    user_check = users.find_one({'username' : username , 'code' : code})
+
+    if user_check != None:
+        user_active = users.update({'username' : username , 'code' : code},{'$set':{'activate' : True}})
+
+    return render_template('activeuser.html' , user=user_check)
+
 
 
 if __name__ == '__main__':
