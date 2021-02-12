@@ -1,6 +1,27 @@
-{% if user != None %}
-  <h1>Hello, {{ user }}</h1>
-  <a href="http://127.0.0.1:5000/logout">Logout</a>
-{% else %}
-  <h1>Hello, World</h1>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='index.css') }}">
+  </head>
+    <body>
+      <header>
+        {% if user != None %}
+          <h1>Hi, {{ user }}</h1>
+          <a href="http://127.0.0.1:5000/logout">Logout</a>
+        {% else %}
+          <h1>Welcome To EverliceBet</h1>
+
+          <div>
+              <a href="#">
+                <button type="button" name="button">Login</button>
+              </a>
+              <a href="#">
+                <button type="button" name="button">Register</button>
+              </a>
+          </div>
+        {% endif %}
+    </header>
+  </body>
+</html>
