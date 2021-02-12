@@ -1,0 +1,12 @@
+<form method="post" id="form">
+  <select name="coin">
+    {% if coin_list %}
+      {% for x in coin_list %}
+        <option value="{{ x }}">{{ x }}</option>
+      {% endfor %}
+    {% endif %}
+  </select>
+  <input type="text" placeholder="Guess the price" name="guess" id="guess"/>
+  <input type="date" id="date" name="date" value="{{ time }}" min="{{time}}">
+  <button class="btn-login" id="sub">LOGIN</button>
+</form>

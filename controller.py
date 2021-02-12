@@ -1,13 +1,16 @@
 from flask import Flask, render_template, request, jsonify, session,redirect
 from flask_pymongo import PyMongo
 from utils.registeralogin import util
+from pycoingecko import CoinGeckoAPI
 from sendemail import send_message
-import random
+import random, datetime
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/betsite_db"
 mongo = PyMongo(app)
 users = mongo.db.user
+forecasts = mongo.db.forecasts
+coingecko = CoinGeckoAPI()
 
 @app.route('/')
 def index():
@@ -165,6 +168,12 @@ def activate_user(username,code):
 
     return render_template('activeuser.html' , user=user_check)
 
+
+@app.route('/forecast')
+def forecast():
+    time = datetime.datetime.now()
+    lists = ['Bitcoin' , 'Ethereum' , 'Ripple', 'Litecoin' , 'Bitcoin Cash', 'Stellar', 'Uniswap' , 'Cardano']
+    return render_template('forecast.html' , coin_list = lists, time = time.strftime("%x"))
 
 
 if __name__ == '__main__':

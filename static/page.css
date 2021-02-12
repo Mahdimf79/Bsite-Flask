@@ -137,12 +137,12 @@ label {
 
 
 .erroralert {
+  color: #fff;
   width: 350px;
   height:80px;
   background: #f45;
   border-radius: 20px;
-  padding: 20px;
-  color: #fff;
+  padding: 20px;  
   margin: auto auto;
 }
 
