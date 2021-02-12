@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}">
     </head>
     <body>
-      <div id="erroralert">
+      <div id="erroralert" class="erroralert">
         <p id="error"></p>
       </div>
 
@@ -60,13 +60,13 @@
 
       function show_alert(){
         const alerts = document.getElementById('erroralert');
-        alerts.classList.add("erroralert");
+        alerts.classList.add("erroralert2");
         return
       }
 
       function hide_alert(){
         const alerts = document.getElementById('erroralert');
-        alerts.classList.remove("erroralert");
+        alerts.classList.remove("erroralert2");
         error.innerHTML = "";
         return
       }
