@@ -9,15 +9,22 @@
       <header>
         {% if user != None %}
           <h1>Hi, {{ user }}</h1>
-          <a href="http://127.0.0.1:5000/logout">Logout</a>
+          <div>
+              <a href="http://127.0.0.1:5000/logout">
+                <button type="button" name="button">Logout</button>
+              </a>
+              <a href="http://127.0.0.1:5000/forecast">
+                <button type="button" name="button">Forecast</button>
+              </a>
+          </div>
         {% else %}
           <h1>Welcome To EverliceBet</h1>
 
           <div>
-              <a href="#">
+              <a href="http://127.0.0.1:5000/login">
                 <button type="button" name="button">Login</button>
               </a>
-              <a href="#">
+              <a href="http://127.0.0.1:5000/register">
                 <button type="button" name="button">Register</button>
               </a>
           </div>

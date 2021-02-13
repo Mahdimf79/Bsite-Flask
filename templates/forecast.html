@@ -1,5 +1,8 @@
+<div id="erroralert" class="erroralert">
+  <p id="error"></p>
+</div>
 <form method="post" id="form">
-  <select name="coin">
+  <select name="coin" id="coin">
     {% if coin_list %}
       {% for x in coin_list %}
         <option value="{{ x }}">{{ x }}</option>
@@ -7,6 +10,45 @@
     {% endif %}
   </select>
   <input type="text" placeholder="Guess the price" name="guess" id="guess"/>
-  <input type="date" id="date" name="date" value="{{ time }}" min="{{time}}">
-  <button class="btn-login" id="sub">LOGIN</button>
+  <input type="date" id="date" name="date" value="{{ time }}" min="{{ time }}">
+  <input type="text" placeholder="Bet amount" name="money" id="money"/>
+  <button class="btn-login" id="sub">Create</button>
 </form>
+
+{% block javascript %}
+  <script>
+    const form = document.getElementById('form');
+
+    form.addEventListener('submit', handleSubmit);
+
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      const coin = document.getElementById('coin').value;
+
+      const guess = document.getElementById('guess').value;
+
+      const date = document.getElementById('date').value;
+
+      const money = document.getElementById('money').value;
+
+
+      fetch('http://127.0.0.1:5000/forecast/set',{
+         method: 'POST',
+         headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+           "X-CSRFToken": '{{csrf_token}}',
+         },
+         body: `coin=${coin}&guess=${guess}&date=${date}&money=${money}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.ok){
+          alert(data.status)
+        }else {
+          error.innerHTML = data.status;
+        }
+      });
+
+    }
+  </script>
+{% endblock javascript %}

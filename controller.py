@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session,redirect
 from flask_pymongo import PyMongo
-from utils.registeralogin import util
+from utils import regAlog, forecastU
 from pycoingecko import CoinGeckoAPI
 from sendemail import send_message
 import random, datetime
@@ -34,28 +34,28 @@ def register_set():
         repassword = request.form['repassword']
         email = request.form['email']
 
-        if not util.checklength(username,5,30):
+        if not regAlog.checklength(username,5,30):
             obj = {
                 'ok': False,
                 'status' : 'The number of characters in the username is not allowed'
             }
             return jsonify(obj)
 
-        if not util.checklength(password,8,64):
+        if not regAlog.checklength(password,8,64):
             obj = {
                 'ok': False,
                 'status' : 'The number of characters in the password is not allowed'
             }
             return jsonify(obj)
 
-        if not util.checkpassword(password,repassword):
+        if not regAlog.checkpassword(password,repassword):
             obj = {
                 'ok': False,
                 'status' : 'The password is different from repeating the password'
             }
             return jsonify(obj)
 
-        if not util.emailvalidate(email):
+        if not regAlog.emailvalidate(email):
             obj = {
                 'ok': False,
                 'status' : 'Invalid Email'
@@ -96,7 +96,7 @@ def register_set():
             }
         return jsonify(obj)
     else:
-        return render_template('register.html')
+        return redirect('/register')
 
 
 @app.route('/login')
@@ -111,14 +111,14 @@ def login_set():
         username = request.form['username']
         password = request.form['password']
 
-        if not util.checklength(username,5,30):
+        if not regAlog.checklength(username,5,30):
             obj = {
                 'ok': False,
                 'status' : 'The number  of characters in the username is not allowed'
             }
             return jsonify(obj)
 
-        if not util.checklength(password,8,64):
+        if not regAlog.checklength(password,8,64):
             obj = {
                 'ok': False,
                 'status' : 'The number of characters in the password is not allowed'
@@ -147,7 +147,7 @@ def login_set():
                 'status' : 'Username or password is incorrect'
             }
     else:
-        return render_template('index.html')
+        return redirect('/login')
 
     return jsonify(obj)
 
@@ -171,9 +171,69 @@ def activate_user(username,code):
 
 @app.route('/forecast')
 def forecast():
+    if session.get('username') == None:
+        return redirect('/')
     time = datetime.datetime.now()
     lists = ['Bitcoin' , 'Ethereum' , 'Ripple', 'Litecoin' , 'Bitcoin Cash', 'Stellar', 'Uniswap' , 'Cardano']
     return render_template('forecast.html' , coin_list = lists, time = time.strftime("%x"))
+
+
+@app.route('/forecast/set', methods=['GET', 'POST'])
+def forecast_set():
+    if session.get('username') == None:
+        return redirect('/')
+
+    if request.method == 'POST':
+        coin = request.form['coin']
+        guess = request.form['guess']
+        date = request.form['date']
+        money = request.form['money']
+        username = session.get('username')
+
+
+        if not forecastU.checkNull(date):
+            obj= {
+                'ok': False,
+                'status' : 'Enter the date'
+            }
+            return jsonify(obj)
+
+        if not forecastU.checkmoney(money):
+            obj= {
+                'ok': False,
+                'status' : 'The minimum wage prerequisite is $ 5'
+            }
+            return jsonify(obj)
+
+        if not forecastU.checkNull(guess):
+            obj= {
+                'ok': False,
+                'status' : 'The prediction value is empty'
+            }
+            return jsonify(obj)
+
+        obj_bet = {
+            'coin' : coin,
+            'guess' : int(guess),
+            'date' : date,
+            'money' : int(money),
+            'username' : username,
+            'count' : 1,
+            'users': []
+        }
+
+        forecasts.insert_one(obj_bet)
+
+        obj = {
+            'ok' : True,
+            'status' : 'create'
+        }
+
+        return jsonify(obj)
+
+    else:
+        return redirect('/forecast')
+
 
 
 if __name__ == '__main__':
