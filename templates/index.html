@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='index.css') }}">
   </head>
     <body>
+      <div id="erroralert" class="erroralert">
+        <p id="error"></p>
+      </div>
       <header>
         {% if user != None %}
           <h1>Hi, {{ user }}</h1>
@@ -37,7 +40,7 @@
           <p><span>Guess : </span>{{ cast['guess'] }}</p>
           <p><span>Date : </span>{{ cast['date'] }}</p>
           <p><span>Money : </span>{{ cast['money'] }}</p>
-          <button type="button" name="button" id="but" class="{{ cast['_id'] }}">Participation</button>
+          <button type="button" name="button" id="{{ cast['id'] }}" onclick="handleSubmit(this.id)">Participation</button>
         </div>
       {% endfor %}
     {% endif %}
@@ -47,22 +50,27 @@
   {% block javascript %}
     <script>
 
-    const but = document.getElementById('but');
+      const error = document.getElementById('error');
 
-    but.addEventListener('click', handleSubmit);
+      function handleSubmit(id) {
 
-    function handleSubmit(e) {
-      e.preventDefault();
-
-      idcast = document.getElementById('but').className;
-      url = 'http://127.0.0.1:5000/participation/' + idcast;
-
-      fetch(url)
+        fetch('http://127.0.0.1:5000/participation/set',{
+           method: 'POST',
+           headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+             "X-CSRFToken": '{{csrf_token}}',
+           },
+           body: `idcast=${id}`
+        })
         .then(response => response.json())
-        .then(data => console.log(data.status));
+        .then(data => {
+          if(data.ok){
+            error.innerHTML = data.status;
+          }else{
+            error.innerHTML = data.status;
+          }
+        });
 
-
-    }
+      }
 
     </script>
   {% endblock javascript %}

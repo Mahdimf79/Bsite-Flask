@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 from utils import regAlog, forecastU
 from pycoingecko import CoinGeckoAPI
 from sendemail import send_message
-import random, datetime
+import random, datetime, uuid
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/betsite_db"
@@ -232,7 +232,9 @@ def forecast_set():
             }
             return jsonify(obj)
 
+        id = uuid.uuid1()
         obj_bet = {
+            'id' : id.hex,
             'coin' : coin,
             'guess' : int(guess),
             'date' : date,
@@ -259,34 +261,56 @@ def forecast_set():
         return redirect('/forecast')
 
 
-@app.route('/participation/<id>')
-def participation(id):
-    if session.get('username') != None:
+@app.route('/participation/set', methods=['GET', 'POST'])
+def participation_set():
+    if session.get('username') == None:
+        return redirect('/login')
+    if request.method == 'POST':
+        id = request.form['idcast']
+        requestuser = session.get('username')
+        print(id)
+        cast = forecasts.find_one({'id' : id})
+
+        getuser = users.find_one({'username' : requestuser})
+
+
+        if cast['username'] == requestuser:
+            obj= {
+                'ok': False,
+                'status' : 'You can not participate yourself'
+            }
+            return jsonify(obj)
+
+        money = getuser['money']
+        price = cast['money']
+
+        if money < price:
+            obj= {
+                'ok': False,
+                'status' : 'Your money is not enough to participate in this forecast'
+            }
+            return jsonify(obj)
+
+        if requestuser in cast['users']:
+            obj= {
+                'ok': False,
+                'status' : 'You have participated in this prediction'
+            }
+            return jsonify(obj)
+
+        listc = cast['users']
+        listc.append(requestuser)
+        forecasts.update({'id' : id },
+            {'$set':{'users' : listc, 'count' : cast['count'] + 1}})
+
+        obj= {
+            'ok': True,
+            'status' : 'sucsses'
+        }
+        return jsonify(obj)
+    else:
         return redirect('/')
 
-    requestuser = session.get('username')
-    cast = forecasts.find_one({'_id' : id})
-    getuser = users.find_one({'username' : username})
-
-    if cast['username'] == requestuser:
-        obj= {
-            'ok': False,
-            'status' : 'You can not participate yourself'
-        }
-        return jsonify(obj)
-
-
-    money = getuser['money']
-    price = cast['money']
-
-    if money < price:
-        obj= {
-            'ok': False,
-            'status' : 'Your money is not enough to participate in this forecast'
-        }
-        return jsonify(obj)
-
-    return redirect('/login')
 
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
