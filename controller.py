@@ -17,7 +17,8 @@ def index():
     context = None
     if session.get('username') != None:
         context = session.get('username')
-    return render_template('index.html', user=context)
+    forecasts_notstart = forecasts.find({'count' : 1})
+    return render_template('index.html', user=context, forecast = forecasts_notstart)
 
 
 @app.route('/register')
@@ -72,6 +73,7 @@ def register_set():
                 'email' : email,
                 'score' : 0,
                 'money' : 0,
+                'countcast' : 3,
                 'activate' : False,
                 'code' : ran
             }
@@ -174,8 +176,12 @@ def forecast():
     if session.get('username') == None:
         return redirect('/')
     time = datetime.datetime.now()
+    y = time.strftime("%Y")
+    m = time.strftime("%m")
+    d = time.strftime("%d")
+    date = y + '-' + m + '-' + d
     lists = ['Bitcoin' , 'Ethereum' , 'Ripple', 'Litecoin' , 'Bitcoin Cash', 'Stellar', 'Uniswap' , 'Cardano']
-    return render_template('forecast.html' , coin_list = lists, time = time.strftime("%x"))
+    return render_template('forecast.html' , coin_list = lists, time = date)
 
 
 @app.route('/forecast/set', methods=['GET', 'POST'])
@@ -189,7 +195,7 @@ def forecast_set():
         date = request.form['date']
         money = request.form['money']
         username = session.get('username')
-
+        score = users.find_one({'username' : username})
 
         if not forecastU.checkNull(date):
             obj= {
@@ -212,6 +218,20 @@ def forecast_set():
             }
             return jsonify(obj)
 
+        if score['countcast'] <= 0:
+            obj= {
+                'ok': False,
+                'status' : 'Your allowed number of predictions has expired'
+            }
+            return jsonify(obj)
+
+        if score['money'] < int(money):
+            obj= {
+                'ok': False,
+                'status' : 'Account balance is low'
+            }
+            return jsonify(obj)
+
         obj_bet = {
             'coin' : coin,
             'guess' : int(guess),
@@ -223,6 +243,10 @@ def forecast_set():
         }
 
         forecasts.insert_one(obj_bet)
+        users.update({'username' : username },
+            {'$set':{'countcast' : score['countcast'] - 1,
+                'money' : score['money'] - int(money)}
+            })
 
         obj = {
             'ok' : True,
@@ -235,6 +259,34 @@ def forecast_set():
         return redirect('/forecast')
 
 
+@app.route('/participation/<id>')
+def participation(id):
+    if session.get('username') != None:
+        return redirect('/')
+
+    requestuser = session.get('username')
+    cast = forecasts.find_one({'_id' : id})
+    getuser = users.find_one({'username' : username})
+
+    if cast['username'] == requestuser:
+        obj= {
+            'ok': False,
+            'status' : 'You can not participate yourself'
+        }
+        return jsonify(obj)
+
+
+    money = getuser['money']
+    price = cast['money']
+
+    if money < price:
+        obj= {
+            'ok': False,
+            'status' : 'Your money is not enough to participate in this forecast'
+        }
+        return jsonify(obj)
+
+    return redirect('/login')
 
 if __name__ == '__main__':
     app.secret_key = 'super secret key'

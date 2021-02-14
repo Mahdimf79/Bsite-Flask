@@ -30,5 +30,41 @@
           </div>
         {% endif %}
     </header>
+    {% if forecast %}
+      {% for cast in forecast %}
+        <div style="color:white;">
+          <p><span>Coin : </span>{{ cast['coin'] }}</p>
+          <p><span>Guess : </span>{{ cast['guess'] }}</p>
+          <p><span>Date : </span>{{ cast['date'] }}</p>
+          <p><span>Money : </span>{{ cast['money'] }}</p>
+          <button type="button" name="button" id="but" class="{{ cast['_id'] }}">Participation</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+
+
+  {% block javascript %}
+    <script>
+
+    const but = document.getElementById('but');
+
+    but.addEventListener('click', handleSubmit);
+
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      idcast = document.getElementById('but').className;
+      url = 'http://127.0.0.1:5000/participation/' + idcast;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => console.log(data.status));
+
+
+    }
+
+    </script>
+  {% endblock javascript %}
   </body>
 </html>

@@ -43,7 +43,7 @@
       .then(response => response.json())
       .then(data => {
         if(data.ok){
-          alert(data.status)
+          window.location.href = "http://127.0.0.1:5000/";
         }else {
           error.innerHTML = data.status;
         }
