@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 from utils import regAlog, forecastU
 from pycoingecko import CoinGeckoAPI
 from sendemail import send_message
+from checkforecast import startbet
 import random, datetime, uuid
 
 app = Flask(__name__)
@@ -11,6 +12,10 @@ mongo = PyMongo(app)
 users = mongo.db.user
 forecasts = mongo.db.forecasts
 coingecko = CoinGeckoAPI()
+timerruns = mongo.db.timerrun
+lis=[]
+timerruns.update({'status' : True},{'$set' : {'ids' : lis}})
+startbet()
 
 @app.route('/')
 def index():
@@ -18,7 +23,10 @@ def index():
     if session.get('username') != None:
         context = session.get('username')
     forecasts_notstart = forecasts.find({'count' : 1})
-    return render_template('index.html', user=context, forecast = forecasts_notstart)
+    forecasts_start = forecasts.find({'count' : 2 , 'activate' : True})
+    forecasts_end = forecasts.find({'activate' : False})
+    return render_template('index.html', user=context, forecast_notstart = forecasts_notstart,
+        forecasts_start = forecasts_start, forecasts_end = forecasts_end)
 
 
 @app.route('/register')
@@ -166,7 +174,7 @@ def activate_user(username,code):
     user_check = users.find_one({'username' : username , 'code' : code})
 
     if user_check != None:
-        user_active = users.update({'username' : username , 'code' : code},{'$set':{'activate' : True}})
+        users.update({'username' : username , 'code' : code},{'$set':{'activate' : True}})
 
     return render_template('activeuser.html' , user=user_check)
 
@@ -180,7 +188,7 @@ def forecast():
     m = time.strftime("%m")
     d = time.strftime("%d")
     date = y + '-' + m + '-' + d
-    lists = ['Bitcoin' , 'Ethereum' , 'Ripple', 'Litecoin' , 'Bitcoin Cash', 'Stellar', 'Uniswap' , 'Cardano']
+    lists = ['Bitcoin' , 'Ethereum' , 'Ripple', 'Litecoin' , 'Bitcoin-Cash', 'Stellar', 'Uniswap' , 'Cardano']
     return render_template('forecast.html' , coin_list = lists, time = date)
 
 
@@ -193,6 +201,7 @@ def forecast_set():
         coin = request.form['coin']
         guess = request.form['guess']
         date = request.form['date']
+        times = request.form['times']
         money = request.form['money']
         username = session.get('username')
         score = users.find_one({'username' : username})
@@ -201,6 +210,13 @@ def forecast_set():
             obj= {
                 'ok': False,
                 'status' : 'Enter the date'
+            }
+            return jsonify(obj)
+
+        if not forecastU.checkNull(times):
+            obj= {
+                'ok': False,
+                'status' : 'Enter the time'
             }
             return jsonify(obj)
 
@@ -232,16 +248,20 @@ def forecast_set():
             }
             return jsonify(obj)
 
+        timeset = times.split(':')
         id = uuid.uuid1()
         obj_bet = {
             'id' : id.hex,
             'coin' : coin,
             'guess' : int(guess),
-            'date' : date,
+            'date' : date + ('-' + timeset[0] + '-' + timeset[1]),
             'money' : int(money),
             'username' : username,
             'count' : 1,
-            'users': []
+            'activate' : True,
+            'users': None,
+            'winner' : None,
+            'loser' : None
         }
 
         forecasts.insert_one(obj_bet)
@@ -254,7 +274,6 @@ def forecast_set():
             'ok' : True,
             'status' : 'create'
         }
-
         return jsonify(obj)
 
     else:
@@ -264,11 +283,15 @@ def forecast_set():
 @app.route('/participation/set', methods=['GET', 'POST'])
 def participation_set():
     if session.get('username') == None:
-        return redirect('/login')
+        obj= {
+            'ok': False,
+            'status' : 'Please login'
+        }
+        return jsonify(obj)
+
     if request.method == 'POST':
         id = request.form['idcast']
         requestuser = session.get('username')
-        print(id)
         cast = forecasts.find_one({'id' : id})
 
         getuser = users.find_one({'username' : requestuser})
@@ -291,18 +314,21 @@ def participation_set():
             }
             return jsonify(obj)
 
-        if requestuser in cast['users']:
+        if requestuser == cast['users']:
             obj= {
                 'ok': False,
                 'status' : 'You have participated in this prediction'
             }
             return jsonify(obj)
 
-        listc = cast['users']
-        listc.append(requestuser)
-        forecasts.update({'id' : id },
-            {'$set':{'users' : listc, 'count' : cast['count'] + 1}})
 
+        forecasts.update({'id' : id },
+            {'$set':{'users' : requestuser, 'count' : cast['count'] + 1}})
+
+        users.update({'username' : requestuser},{'$set' : {'money' : money - price}})
+
+        startbet()
+        
         obj= {
             'ok': True,
             'status' : 'sucsses'
@@ -310,8 +336,8 @@ def participation_set():
         return jsonify(obj)
     else:
         return redirect('/')
-
-
+        
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.run(debug=True)
+  

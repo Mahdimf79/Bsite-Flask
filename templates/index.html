@@ -1,78 +1,102 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='index.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='index.css') }}"
+    />
   </head>
-    <body>
-      <div id="erroralert" class="erroralert">
-        <p id="error"></p>
+  <body>
+    <div id="erroralert" class="erroralert">
+      <p id="error"></p>
+    </div>
+    <header>
+      {% if user != None %}
+      <h1>Hi, {{ user }}</h1>
+      <div>
+        <a href="http://127.0.0.1:5000/logout">
+          <button type="button" name="button">Logout</button>
+        </a>
+        <a href="http://127.0.0.1:5000/forecast">
+          <button type="button" name="button">Forecast</button>
+        </a>
       </div>
-      <header>
-        {% if user != None %}
-          <h1>Hi, {{ user }}</h1>
-          <div>
-              <a href="http://127.0.0.1:5000/logout">
-                <button type="button" name="button">Logout</button>
-              </a>
-              <a href="http://127.0.0.1:5000/forecast">
-                <button type="button" name="button">Forecast</button>
-              </a>
-          </div>
-        {% else %}
-          <h1>Welcome To EverliceBet</h1>
+      {% else %}
+      <h1>Welcome To EverliceBet</h1>
 
-          <div>
-              <a href="http://127.0.0.1:5000/login">
-                <button type="button" name="button">Login</button>
-              </a>
-              <a href="http://127.0.0.1:5000/register">
-                <button type="button" name="button">Register</button>
-              </a>
-          </div>
-        {% endif %}
+      <div>
+        <a href="http://127.0.0.1:5000/login">
+          <button type="button" name="button">Login</button>
+        </a>
+        <a href="http://127.0.0.1:5000/register">
+          <button type="button" name="button">Register</button>
+        </a>
+      </div>
+      {% endif %}
     </header>
-    {% if forecast %}
-      {% for cast in forecast %}
-        <div style="color:white;">
-          <p><span>Coin : </span>{{ cast['coin'] }}</p>
-          <p><span>Guess : </span>{{ cast['guess'] }}</p>
-          <p><span>Date : </span>{{ cast['date'] }}</p>
-          <p><span>Money : </span>{{ cast['money'] }}</p>
-          <button type="button" name="button" id="{{ cast['id'] }}" onclick="handleSubmit(this.id)">Participation</button>
-        </div>
-      {% endfor %}
-    {% endif %}
-
-
-
-  {% block javascript %}
+    {% if forecast_notstart %} {% for cast in forecast_notstart %}
+    <div style="color: white">
+      <h1>Not Started</h1>
+      <p><span>Coin : </span>{{ cast['coin'] }}</p>
+      <p><span>Guess : </span>{{ cast['guess'] }}</p>
+      <p><span>Date : </span>{{ cast['date'] }}</p>
+      <p><span>Money : </span>{{ cast['money'] }}</p>
+      <button
+        type="button"
+        name="button"
+        id="{{ cast['id'] }}"
+        onclick="handleSubmit(this.id)"
+      >
+        Participation
+      </button>
+    </div>
+    {% endfor %} {% endif %} {% if forecasts_start %} {% for cast in
+    forecasts_start %}
+    <div style="color: white">
+      <h1>Started</h1>
+      <p><span>Coin : </span>{{ cast['coin'] }}</p>
+      <p><span>Guess : </span>{{ cast['guess'] }}</p>
+      <p><span>Date : </span>{{ cast['date'] }}</p>
+      <p><span>Money : </span>{{ cast['money'] }}</p>
+      <p><span>Builder User : </span>{{ cast['username'] }}</p>
+      <p><span>Participating User : </span>{{ cast['users'] }}</p>
+    </div>
+    {% endfor %} {% endif %} {% if forecasts_end %} {% for cast in forecasts_end
+    %}
+    <div style="color: white">
+      <h1>Finished</h1>
+      <p><span>Coin : </span>{{ cast['coin'] }}</p>
+      <p><span>Guess : </span>{{ cast['guess'] }}</p>
+      <p><span>Date : </span>{{ cast['date'] }}</p>
+      <p><span>Money : </span>{{ cast['money'] }}</p>
+      <p><span>Winner : </span>{{ cast['winner'] }}</p>
+      <p><span>Loser : </span>{{ cast['loser'] }}</p>
+    </div>
+    {% endfor %} {% endif %} {% block javascript %}
     <script>
-
-      const error = document.getElementById('error');
+      const error = document.getElementById("error");
 
       function handleSubmit(id) {
-
-        fetch('http://127.0.0.1:5000/participation/set',{
-           method: 'POST',
-           headers: { 'Content-Type': 'application/x-www-form-urlencoded',
-             "X-CSRFToken": '{{csrf_token}}',
-           },
-           body: `idcast=${id}`
+        fetch("http://127.0.0.1:5000/participation/set", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{csrf_token}}",
+          },
+          body: `idcast=${id}`,
         })
-        .then(response => response.json())
-        .then(data => {
-          if(data.ok){
-            error.innerHTML = data.status;
-          }else{
-            error.innerHTML = data.status;
-          }
-        });
-
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.ok) {
+              error.innerHTML = data.status;
+            } else {
+              error.innerHTML = data.status;
+            }
+          });
       }
-
     </script>
-  {% endblock javascript %}
+    {% endblock javascript %}
   </body>
 </html>
