@@ -358,6 +358,51 @@ def profile(username):
 
     return render_template('profile.html' , user = user)
 
+
+@app.route('/profile/<username>/getcount', methods=['GET', 'POST'])
+def getcount(username):
+    if session.get('username') == None:
+        return redirect('/')
+
+    user = users.find_one({'username' : username})
+    score = user['score']
+    countcast = user['countcast']
+    ran = 0
+    if score >= 100 and score < 250:
+        ran = random.randint(1,5)
+        countcast += ran
+    elif score >= 250 and score < 500: 
+        ran = random.randint(5,10)
+        countcast += ran
+    elif score >= 500 and score < 1000:
+        ran = random.randint(10,20)
+        countcast += ran
+    elif score >= 1000 and score < 2000:
+        ran = random.randint(20,40)
+        countcast += ran
+    elif score >= 2000 and score < 5000:
+        ran = random.randint(40,100)
+        countcast += ran
+    elif score >= 5000:
+        ran = 250
+        countcast += ran
+    else :
+        obj = {
+            'ok' : False,
+            'status' : 'Your score is low for receiving'
+        }
+        return jsonify(obj)
+
+    users.update_one({'username' : username},{'$set' : {'countcast' : countcast, 'score' : 0}})
+    obj = {
+            'ok' : True,
+            'status' : 'You received the remaining ' + str(ran) + 'bets',
+            'count' : countcast
+        }
+
+    return jsonify(obj)
+
+
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.run(debug=True)

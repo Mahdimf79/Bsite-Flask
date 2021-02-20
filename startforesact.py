@@ -55,14 +55,22 @@ def checkprice(coin,id):
     usero = users.find_one({'username' : cast['username']})
     guess = cast['guess']
     money = cast['money']
+    scoreplus = cast['score'] + ((money*4) - 6)
+    scoremin = cast['score'] - ((money*4) - 6)
     winer = ''
     loser = ''
     if guess != price:
-        users.update_one({'username' : cast['users']},{'$set': {'money' : userc['money'] + (money*2)}})
+        users.update_one({'username' : cast['users']},{'$set': {'money' : userc['money'] + (money*2),
+            'score' : scoreplus}})
+
+        users.update_one({'username' : cast['username']},{'$set': {'score' : scoremin}})
         winer = cast['users']
         loser = cast['username']
     else:
-        users.update_one({'username' : cast['username']},{'$set': {'money' : usero['money'] + (money*2)}})
+        users.update_one({'username' : cast['username']},{'$set': {'money' : usero['money'] + (money*2),
+            'score' : scoreplus}})
+
+        users.update_one({'username' : cast['users']},{'$set': {'score' : scoremin}})
         winer = cast['username']
         loser = cast['users']
 

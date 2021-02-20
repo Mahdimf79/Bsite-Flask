@@ -1,7 +1,47 @@
 {% if user %}
-<p><span>Username : </span> {{ user['username'] }}</p>
+<p><span>Username : </span>{{ user['username'] }}</p>
 <p><span>Email : </span> {{ user['email'] }}</p>
-<p><span>Score : </span> {{ user['score'] }}</p>
+<p><span>Score : </span><span id="score">{{ user['score'] }}</span></p>
 <p><span>Money : </span> {{ user['money'] }} $</p>
-<p><span>Remaining condition : </span> {{ user['countcast'] }}</p>
+<p>
+  <span>Remaining condition : </span>
+  <span id="count"> {{ user['countcast'] }}</span>
+</p>
+<button
+  type="button"
+  name="button"
+  onclick="handleSubmit(String='{{user['username']}}')"
+>
+  Get Bet
+</button>
 {% endif %}
+
+<div id="erroralert" class="erroralert">
+  <p id="error"></p>
+</div>
+
+<script>
+  const error = document.getElementById("error");
+  const score = document.getElementById("score");
+  const count = document.getElementById("count");
+
+  function handleSubmit(username) {
+    fetch("http://127.0.0.1:5000/profile/" + username + "/getcount", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": "{{csrf_token}}",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.ok) {
+          error.innerHTML = data.status;
+          score.innerHTML = "0";
+          count.innerHTML = data.count;
+        } else {
+          error.innerHTML = data.status;
+        }
+      });
+  }
+</script>
