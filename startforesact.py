@@ -55,8 +55,8 @@ def checkprice(coin,id):
     usero = users.find_one({'username' : cast['username']})
     guess = cast['guess']
     money = cast['money']
-    scoreplus = cast['score'] + ((money*4) - 6)
-    scoremin = cast['score'] - ((money*4) - 6)
+    scoreplus = userc['score'] + ((money*4) - 6)
+    scoremin = usero['score'] - ((money*4) - 6)
     winer = ''
     loser = ''
     if guess != price:
@@ -68,9 +68,9 @@ def checkprice(coin,id):
         loser = cast['username']
     else:
         users.update_one({'username' : cast['username']},{'$set': {'money' : usero['money'] + (money*2),
-            'score' : scoreplus}})
+            'score' : usero['score'] + ((money*4) - 6)}})
 
-        users.update_one({'username' : cast['users']},{'$set': {'score' : scoremin}})
+        users.update_one({'username' : cast['users']},{'$set': {'score' : userc['score'] - ((money*4) - 6)}})
         winer = cast['username']
         loser = cast['users']
 
@@ -92,7 +92,7 @@ def startbet():
             idl = timers
             idl.append(start[0])
             try:
-                timer = threading.Timer(secound,checkprice ,[coin,cast['id']])
+                timer = threading.Timer(10,checkprice ,[coin,cast['id']])
                 timer.start()
                 timerruns.update_one({'status' : True},{'$set' : {'ids' : idl}})
             except:

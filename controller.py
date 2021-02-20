@@ -4,6 +4,7 @@ from utils import regAlog, forecastU
 from pycoingecko import CoinGeckoAPI
 from sendemail import send_message
 from startforesact import startbet
+from forgetpassword import forget_message
 from expireforecast import startDbet, endbet
 import random, datetime, uuid
 
@@ -77,6 +78,7 @@ def register_set():
         email_check = users.find_one({'email' : email})
         if user_check == None and email_check == None:
             ran = random.randint(100000,999999)
+            forgetcode = uuid.uuid1()
             obj_user = {
                 'username' : username,
                 'password' : password,
@@ -85,7 +87,8 @@ def register_set():
                 'money' : 0,
                 'countcast' : 3,
                 'activate' : False,
-                'code' : ran
+                'code' : ran,
+                'forgetpassword' : forgetcode.hex
             }
             try:
                 send_message(email,ran,username)
@@ -401,6 +404,86 @@ def getcount(username):
         }
 
     return jsonify(obj)
+
+
+@app.route('/forgetpassword')
+def forget():
+    return render_template('forgetpassword.html')
+
+
+@app.route('/forgetpassword/send', methods=['GET', 'POST'])
+def forgetpassword(methods=['GET', 'POST']):
+    email = request.form['email']
+    user = users.find_one({'email' : email})
+
+    if not regAlog.emailvalidate(email):
+            obj = {
+                'ok': False,
+                'status' : 'Invalid Email'
+            }
+            return jsonify(obj)
+
+    if user != None:
+        forget_message(email,user['forgetpassword'],user['username'])
+        obj = {
+            'ok' : True,
+            'status' : 'A password recovery link has been sent to your email'
+        }
+        return jsonify(obj)
+    else:
+        obj = {
+            'ok' : False,
+            'status' : 'This email is not registered'
+        }
+
+    return jsonify(obj)
+
+
+@app.route('/forgetpassword/<email>/<code>')
+def forgetpasswordshow(email,code):
+    user = users.find_one({'email' : email , 'forgetpassword' : code})
+    if user == None:
+        return redirect('/')
+    return render_template('forgetpassword-privite.html' , user = user)
+
+
+@app.route('/forgetpassword/<email>/<code>/set', methods=['GET', 'POST'])
+def forgetpasswordset(email,code):
+    user = users.find_one({'email' : email , 'forgetpassword' : code})
+    if user == None:
+        obj = {
+            'ok': False,
+            'status' : 'This link has been used before'
+        }
+        return jsonify(obj)
+    
+    password = request.form['password']
+    repassword = request.form['repassword']
+
+    if not regAlog.checklength(password,8,64):
+        obj = {
+            'ok': False,
+            'status' : 'The number of characters in the password is not allowed'
+        }
+        return jsonify(obj)
+
+    if not regAlog.checkpassword(password,repassword):
+        obj = {
+            'ok': False,
+            'status' : 'The password is different from repeating the password'
+        }
+        return jsonify(obj)
+
+    forgetcode = uuid.uuid1()
+    users.update_one({'email' : email , 'forgetpassword' : code},{'$set' : 
+        {'password' : password,'forgetpassword': forgetcode.hex}})
+    obj = {
+            'ok': True,
+            'status' : 'Your password has changed'
+        }
+    
+    return jsonify(obj)
+
 
 
 if __name__ == '__main__':
