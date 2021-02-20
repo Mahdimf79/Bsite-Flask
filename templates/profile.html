@@ -1,0 +1,7 @@
+{% if user %}
+<p><span>Username : </span> {{ user['username'] }}</p>
+<p><span>Email : </span> {{ user['email'] }}</p>
+<p><span>Score : </span> {{ user['score'] }}</p>
+<p><span>Money : </span> {{ user['money'] }} $</p>
+<p><span>Remaining condition : </span> {{ user['countcast'] }}</p>
+{% endif %}

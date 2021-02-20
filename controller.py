@@ -343,7 +343,21 @@ def participation_set():
         return jsonify(obj)
     else:
         return redirect('/')
-        
+
+
+@app.route('/profile/<username>')
+def profile(username):
+
+    if session.get('username') == None:
+        return redirect('/')
+
+    user = users.find_one({'username' : username})
+    
+    if user == None:
+        return redirect('/')
+
+    return render_template('profile.html' , user = user)
+
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
     app.run(debug=True)

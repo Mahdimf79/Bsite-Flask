@@ -1,132 +1,160 @@
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>SignUp</title>
-        <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}">
-    </head>
-    <body>
-      <div id="erroralert" class="erroralert">
-        <p id="error"></p>
+  <head>
+    <meta charset="UTF-8" />
+    <title>SignUp</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='page.css') }}" />
+  </head>
+  <body>
+    <div id="erroralert" class="erroralert">
+      <p id="error"></p>
+    </div>
+
+    <form method="post" id="form">
+      <div class="login-box">
+        <div class="text">
+          <p class="title">Here you can register</p>
+          <small>Let's join us :)</small>
+        </div>
+
+        <div class="inputs">
+          <label>Username</label>
+          <input
+            type="text"
+            placeholder="Username"
+            name="username"
+            id="username"
+            class="in2"
+          />
+
+          <label>Email</label>
+          <input
+            type="text"
+            name="email"
+            id="email"
+            placeholder="info@betsite.com"
+            class="in2"
+          />
+
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Password"
+            class="in2"
+          />
+
+          <label>RePassword</label>
+          <input
+            type="text"
+            name="repassword"
+            id="repassword"
+            placeholder="RePassword"
+            class="in2"
+          />
+
+          <button class="btn-login" id="sub">REGISTER</button>
+          <a href="http://127.0.0.1:5000/" class="forget">Home</a>
+        </div>
       </div>
+    </form>
+    <img
+      src="{{ url_for('static',filename='img/wave.svg') }}"
+      alt="wave"
+      class="wave"
+    />
+    <div class="pointer">
+      <a href="http://127.0.0.1:5000/login">
+        Signin
+        <img
+          src="{{ url_for('static',filename='img/icons-8-left.svg') }}"
+          alt="pointer"
+          class="cursor"
+        />
+      </a>
+    </div>
 
-      <form method="post" id="form">
-        <div class="login-box">
-          <div class="text">
-            <p class="title">Here you can register</p>
-            <small>Let's join us :)</small>
-          </div>
+    {% block javascript %}
+    <script>
+      const form = document.getElementById("form");
 
-      <div class="inputs">
-        <label>Username</label>
-        <input type="text" placeholder="Username" name="username" id="username" class="in2"/>
+      form.addEventListener("submit", handleSubmit);
 
-        <label>Email</label>
-        <input type="text" name="email" id="email" placeholder="Email" class="in2"/>
+      function handleSubmit(e) {
+        e.preventDefault();
 
-        <label>Password</label>
-        <input type="text" name="password" id="password" placeholder="Password" class="in2"/>
+        function validateEmail(emailget) {
+          const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return re.test(String(emailget).toLowerCase());
+        }
 
-        <label>RePassword</label>
-        <input type="text" name="repassword" id="repassword" placeholder="RePassword" class="in2"/>
+        function show_alert() {
+          const alerts = document.getElementById("erroralert");
+          alerts.classList.add("erroralert2");
+          return;
+        }
 
-        <button class="btn-login" id="sub">REGISTER</button>
-        <a href="http://127.0.0.1:5000/" class="forget">Home</a>
+        function hide_alert() {
+          const alerts = document.getElementById("erroralert");
+          alerts.classList.remove("erroralert2");
+          error.innerHTML = "";
+          return;
+        }
 
-      </div>
-      </div>
-      </form>
-      <img src="{{ url_for('static',filename='img/wave.svg') }}" alt="wave" class="wave">
-      <div class="pointer">
-        <a href="http://127.0.0.1:5000/login">
-          Signin
-          <img src="{{ url_for('static',filename='img/icons-8-left.svg') }}" alt="pointer" class="cursor">
-        </a>
-      </div>
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const repassword = document.getElementById("repassword").value;
 
-{% block javascript %}
-<script>
+        const error = document.getElementById("error");
 
-    const form = document.getElementById('form');
-
-    form.addEventListener('submit', handleSubmit);
-
-    function handleSubmit(e) {
-      e.preventDefault();
-
-
-      function validateEmail(emailget) {
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(emailget).toLowerCase());
-      }
-
-      function show_alert(){
-        const alerts = document.getElementById('erroralert');
-        alerts.classList.add("erroralert2");
-        return
-      }
-
-      function hide_alert(){
-        const alerts = document.getElementById('erroralert');
-        alerts.classList.remove("erroralert2");
-        error.innerHTML = "";
-        return
-      }
-
-      const username = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const repassword = document.getElementById('repassword').value;
-
-      const error = document.getElementById('error');
-
-
-
-      if(username.length >= 5 && username.length <= 30){
-        if(password.length >= 8 && password.length <= 64){
-          if(repassword == password){
-            if(validateEmail(email)){
-              fetch('http://127.0.0.1:5000/register/set',{
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/x-www-form-urlencoded',
-                   "X-CSRFToken": '{{csrf_token}}',
-                 },
-                 body: `username=${username}&password=${password}&repassword=${repassword}&email=${email}`
-              })
-              .then(response => response.json())
-              .then(data => {
-                if(data.ok){
-                  window.location.href = "http://127.0.0.1:5000/login";
-                }else{
-                  show_alert()
-                  error.innerHTML = data.status;
-                  window.setTimeout(hide_alert, 3000);
-                }
-              });
-            }else{
-              show_alert()
-              error.innerHTML = "Invalid Email";
+        if (username.length >= 5 && username.length <= 30) {
+          if (password.length >= 8 && password.length <= 64) {
+            if (repassword == password) {
+              if (validateEmail(email)) {
+                fetch("http://127.0.0.1:5000/register/set", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{csrf_token}}",
+                  },
+                  body: `username=${username}&password=${password}&repassword=${repassword}&email=${email}`,
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    if (data.ok) {
+                      window.location.href = "http://127.0.0.1:5000/login";
+                    } else {
+                      show_alert();
+                      error.innerHTML = data.status;
+                      window.setTimeout(hide_alert, 3000);
+                    }
+                  });
+              } else {
+                show_alert();
+                error.innerHTML = "Invalid Email";
+                window.setTimeout(hide_alert, 3000);
+              }
+            } else {
+              show_alert();
+              error.innerHTML =
+                "A password is not the same as repeating a password";
               window.setTimeout(hide_alert, 3000);
             }
-          }else{
-            show_alert()
-            error.innerHTML = "A password is not the same as repeating a password";
+          } else {
+            show_alert();
+            error.innerHTML =
+              "The number of characters in the password is not allowed";
             window.setTimeout(hide_alert, 3000);
           }
-        }else{
-          show_alert()
-          error.innerHTML = "The number of characters in the password is not allowed";
+        } else {
+          show_alert();
+          error.innerHTML =
+            "The number of characters in the username is not allowed";
           window.setTimeout(hide_alert, 3000);
         }
-      }else{
-        show_alert()
-        error.innerHTML = "The number of characters in the username is not allowed";
-        window.setTimeout(hide_alert, 3000);
       }
-
-    }
-
-</script>
-{% endblock javascript %}
-
-</body>
+    </script>
+    {% endblock javascript %}
+  </body>
 </html>
