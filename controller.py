@@ -3,7 +3,8 @@ from flask_pymongo import PyMongo
 from utils import regAlog, forecastU
 from pycoingecko import CoinGeckoAPI
 from sendemail import send_message
-from checkforecast import startbet
+from startforesact import startbet
+from expireforecast import startDbet, endbet
 import random, datetime, uuid
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ timerruns = mongo.db.timerrun
 lis=[]
 timerruns.update({'status' : True},{'$set' : {'ids' : lis}})
 startbet()
+endbet()
 
 @app.route('/')
 def index():
@@ -24,7 +26,7 @@ def index():
         context = session.get('username')
     forecasts_notstart = forecasts.find({'count' : 1})
     forecasts_start = forecasts.find({'count' : 2 , 'activate' : True})
-    forecasts_end = forecasts.find({'activate' : False})
+    forecasts_end = forecasts.find({'count' : 2, 'activate' : False})
     return render_template('index.html', user=context, forecast_notstart = forecasts_notstart,
         forecasts_start = forecasts_start, forecasts_end = forecasts_end)
 
@@ -250,6 +252,8 @@ def forecast_set():
 
         timeset = times.split(':')
         id = uuid.uuid1()
+        datecast = datetime.datetime.now()
+        
         obj_bet = {
             'id' : id.hex,
             'coin' : coin,
@@ -258,6 +262,7 @@ def forecast_set():
             'money' : int(money),
             'username' : username,
             'count' : 1,
+            'expiredate' : datecast,
             'activate' : True,
             'users': None,
             'winner' : None,
@@ -269,6 +274,8 @@ def forecast_set():
             {'$set':{'countcast' : score['countcast'] - 1,
                 'money' : score['money'] - int(money)}
             })
+
+        startDbet(obj_bet['id'])
 
         obj = {
             'ok' : True,

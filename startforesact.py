@@ -42,7 +42,6 @@ def timebet():
 
         listsec.append([id,datestart.seconds])
 
-        print(datestart.seconds)
 
     return listsec
 
@@ -59,15 +58,15 @@ def checkprice(coin,id):
     winer = ''
     loser = ''
     if guess != price:
-        users.update({'username' : cast['users']},{'$set': {'money' : userc['money'] + (money*2)}})
+        users.update_one({'username' : cast['users']},{'$set': {'money' : userc['money'] + (money*2)}})
         winer = cast['users']
         loser = cast['username']
     else:
-        users.update({'username' : cast['username']},{'$set': {'money' : usero['money'] + (money*2)}})
+        users.update_one({'username' : cast['username']},{'$set': {'money' : usero['money'] + (money*2)}})
         winer = cast['username']
         loser = cast['users']
 
-    forecasts.update({'id' : id},{'$set' : {'activate' : False, 'winner' : winer, 'loser' : loser}})
+    forecasts.update_one({'id' : id},{'$set' : {'activate' : False, 'winner' : winer, 'loser' : loser}})
 
 
     return 
@@ -87,7 +86,7 @@ def startbet():
             try:
                 timer = threading.Timer(secound,checkprice ,[coin,cast['id']])
                 timer.start()
-                timerruns.update({'status' : True},{'$set' : {'ids' : idl}})
+                timerruns.update_one({'status' : True},{'$set' : {'ids' : idl}})
             except:
                 pass
 
