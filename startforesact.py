@@ -92,7 +92,7 @@ def startbet():
             idl = timers
             idl.append(start[0])
             try:
-                timer = threading.Timer(10,checkprice ,[coin,cast['id']])
+                timer = threading.Timer(secound,checkprice ,[coin,cast['id']])
                 timer.start()
                 timerruns.update_one({'status' : True},{'$set' : {'ids' : idl}})
             except:

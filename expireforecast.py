@@ -51,3 +51,26 @@ def endbet():
             forecasts.delete_one({'id' : id})
 
     return 
+
+
+# def expiredate():
+#     for id in findbet():
+#         dateone = datetime.datetime.now()
+
+#         getcast = forecasts.find_one({'id' : id})
+
+#         datecast = getcast['date'].split('-')
+
+#         checkmonth = datecast[1]
+
+#         if '0' in checkmonth:
+#             checkmonth = checkmonth[1]
+
+#         datetow = datetime.datetime(int(datecast[0]),int(checkmonth),int(datecast[2]),int(datecast[3]),
+#             int(datecast[4]))
+
+
+#         if dateone > datetow : 
+#             forecasts.delete_one({'id' : id})
+
+#     return 

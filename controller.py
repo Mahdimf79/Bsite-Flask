@@ -83,8 +83,8 @@ def register_set():
                 'username' : username,
                 'password' : password,
                 'email' : email,
-                'score' : 0,
-                'money' : 0,
+                'score' : 0.0,
+                'money' : 5.0,
                 'countcast' : 3,
                 'activate' : False,
                 'code' : ran,
@@ -246,7 +246,7 @@ def forecast_set():
             }
             return jsonify(obj)
 
-        if score['money'] < int(money):
+        if score['money'] < float(money):
             obj= {
                 'ok': False,
                 'status' : 'Account balance is low'
@@ -254,15 +254,25 @@ def forecast_set():
             return jsonify(obj)
 
         timeset = times.split(':')
+        date = date + ('-' + timeset[0] + '-' + timeset[1])
+
+        if not forecastU.checktime(date):
+            obj= {
+                'ok': False,
+                'status' : 'The selected date is less than now'
+            }
+            return jsonify(obj)
+
         id = uuid.uuid1()
         datecast = datetime.datetime.now()
+
         
         obj_bet = {
             'id' : id.hex,
             'coin' : coin,
-            'guess' : int(guess),
-            'date' : date + ('-' + timeset[0] + '-' + timeset[1]),
-            'money' : int(money),
+            'guess' : float(guess),
+            'date' : date,
+            'money' : float(money),
             'username' : username,
             'count' : 1,
             'expiredate' : datecast,
@@ -275,7 +285,7 @@ def forecast_set():
         forecasts.insert_one(obj_bet)
         users.update({'username' : username },
             {'$set':{'countcast' : score['countcast'] - 1,
-                'money' : score['money'] - int(money)}
+                'money' : score['money'] - float(money)}
             })
 
         startDbet(obj_bet['id'])
@@ -371,23 +381,8 @@ def getcount(username):
     score = user['score']
     countcast = user['countcast']
     ran = 0
-    if score >= 100 and score < 250:
-        ran = random.randint(1,5)
-        countcast += ran
-    elif score >= 250 and score < 500: 
-        ran = random.randint(5,10)
-        countcast += ran
-    elif score >= 500 and score < 1000:
-        ran = random.randint(10,20)
-        countcast += ran
-    elif score >= 1000 and score < 2000:
-        ran = random.randint(20,40)
-        countcast += ran
-    elif score >= 2000 and score < 5000:
-        ran = random.randint(40,100)
-        countcast += ran
-    elif score >= 5000:
-        ran = 250
+    if score > 0 :
+        ran = ((score * 20) / 1000) 
         countcast += ran
     else :
         obj = {
