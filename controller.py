@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, jsonify, session,redirect
 from flask_pymongo import PyMongo
 from utils import regAlog, forecastU
 from pycoingecko import CoinGeckoAPI
-from sendemail import send_message
-from startforesact import startbet
-from forgetpassword import forget_message
-from expireforecast import startDbet, endbet
+from scripts.sendemail import send_message
+from scripts.startforesact import startbet
+from scripts.forgetpassword import forget_message
+from scripts.expireforecast import startDbet, endbet
 import random, datetime, uuid
 
 app = Flask(__name__)
